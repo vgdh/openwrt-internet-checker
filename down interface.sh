@@ -23,17 +23,18 @@ FAIL_COUNT_FILE="/tmp/fail_count"
 : > "$LOW_LATENCY_COUNT_FILE"
 : > "$FAIL_COUNT_FILE"
 
+echo "START THE SCRIPT"
 
 interface_down() {
   status=$(ifstatus "$INTERFACE" | grep -o '"up": true')
 
   # Check if the interface is up
   if [ "$status" = '"up": true' ]; then
-    echo "The interface $INTERFACE is UP. Bringing it down..."
+    echo "The interface $INTERFACE is UP. Bringing it DOWN..."
     ifdown $INTERFACE
-    echo "$INTERFACE interface has been brought down."
+    echo "$INTERFACE interface has been brought DOWN."
   else
-    echo "The interface $INTERFACE is already DOWN or inactive."
+    echo "The interface $INTERFACE is already DOWN or inactive." > /dev/null
   fi
 }
 
@@ -46,7 +47,7 @@ interface_up() {
     ifup $INTERFACE
     echo "$INTERFACE interface has been brought UP."
   else
-    echo "The interface $INTERFACE is already UP."
+    echo "The interface $INTERFACE is already UP." > /dev/null
   fi
 }
 
@@ -63,7 +64,7 @@ while true; do
             echo 1 >> "$HIGH_LATENCY_COUNT_FILE"
             : > "$LOW_LATENCY_COUNT_FILE"  # Reset low latency count
         else
-            echo "$LATENCY ms within acceptable range"
+            #echo "$LATENCY ms within acceptable range"
             echo 1 >> "$LOW_LATENCY_COUNT_FILE"
             : > "$HIGH_LATENCY_COUNT_FILE"  # Reset high latency count
         fi
@@ -72,11 +73,11 @@ while true; do
         LOW_LATENCY_COUNT=$(wc -l < "$LOW_LATENCY_COUNT_FILE")
 
         if [ $HIGH_LATENCY_COUNT -gt $CHECK_COUNT ]; then
-            echo "High latency sustained for $CHECK_COUNT checks, DOWN $INTERFACE interface..."
+            #echo "High latency sustained for $CHECK_COUNT checks, DOWN $INTERFACE interface..."
             interface_down
             : > "$HIGH_LATENCY_COUNT_FILE"
         elif [ $LOW_LATENCY_COUNT -gt $CHECK_COUNT ]; then
-            echo "Low latency sustained for $CHECK_COUNT checks, UP $INTERFACE interface..."
+            #echo "Low latency sustained for $CHECK_COUNT checks, UP $INTERFACE interface..."
             interface_up
             : > "$LOW_LATENCY_COUNT_FILE"
         fi
@@ -87,7 +88,7 @@ while true; do
         echo 1 >> "$FAIL_COUNT_FILE"
         FAIL_COUNT=$(wc -l < "$FAIL_COUNT_FILE")
         if [ $FAIL_COUNT -gt $CHECK_FAIL_COUNT ]; then
-            echo "Failed to connect $FAIL_COUNT times in a row. DOWN $INTERFACE interface..."
+            #echo "Failed to connect $FAIL_COUNT times in a row. DOWN $INTERFACE interface..."
             interface_down
             : > "$HIGH_LATENCY_COUNT_FILE"  # Reset high latency count
             : > "$LOW_LATENCY_COUNT_FILE"  # Reset low latency count
