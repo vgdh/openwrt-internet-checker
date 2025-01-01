@@ -54,7 +54,8 @@ interface_up() {
 
 while true; do
     # Measure latency using hping3
-    LATENCY=$(hping3 -S -p 80 -c 1 "$TARGET_IP" 2>/dev/null | grep 'rtt=' | awk -F'rtt=' '{print $2}' | awk '{print $1}' | cut -d'/' -f1)
+    #LATENCY=$(hping3 -S -p 80 -c 1 "$TARGET_IP" 2>/dev/null | grep 'rtt=' | awk -F'rtt=' '{print $2}' | awk '{print $1}' | cut -d'/' -f1)
+    LATENCY=$(ping -c 1 "$TARGET_IP" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
 
     if [[ -n "$LATENCY" ]]; then
         LATENCY=${LATENCY%.*} # Convert to integer for comparison
