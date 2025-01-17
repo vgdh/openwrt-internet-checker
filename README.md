@@ -20,3 +20,5 @@ make both of them it executable
 ```
 chmod 755 /usr/bin/inet_check.sh /etc/init.d/inet_check
 ```
+
+Enable the service `inet_check` in the openwrt GUI.
